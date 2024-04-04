@@ -15,7 +15,7 @@ namespace Perpetuum.Zones.Artifacts.Scanners
             _zone = zone;
         }
 
-        public IArtifactScanner CreateArtifactScanner(Player player)
+        public IArtifactScanner CreateArtifactScanner(Player player, GlobalConfiguration globalConfiguration)
         {
             IArtifactRepository artifactRepository;
             IArtifactGenerator artifactGenerator;
@@ -26,7 +26,7 @@ namespace Perpetuum.Zones.Artifacts.Scanners
                 artifactGenerator = new NullArtifactGenerator();
 
                 artifactRepository = new TrainingZoneArtifactRepository();
-                artifactLootGenerator = new TrainingArtifactLootGenerator(new ArtifactLootGenerator(artifactRepository));
+                artifactLootGenerator = new TrainingArtifactLootGenerator(new ArtifactLootGenerator(artifactRepository, globalConfiguration));
             }
             else
             {
@@ -52,7 +52,7 @@ namespace Perpetuum.Zones.Artifacts.Scanners
                 }
 
                 artifactGenerator = cg;
-                artifactLootGenerator = new ArtifactLootGenerator(artifactRepository);
+                artifactLootGenerator = new ArtifactLootGenerator(artifactRepository, globalConfiguration);
             }
 
             var scanner = new ArtifactScanner(_zone, artifactRepository, artifactGenerator ,artifactLootGenerator);
