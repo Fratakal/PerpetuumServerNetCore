@@ -53,7 +53,7 @@ namespace Perpetuum
                 foreach (var file in files)
                 {
                     var languageID = Convert.ToInt32(System.IO.Path.GetFileNameWithoutExtension(file));
-                    var settingsFile = fileManager.ReadAllText(file);
+                    var settingsFile = System.IO.File.ReadAllText(file);
                     var dictionary = JsonConvert.DeserializeObject<Dictionary<string, object>>(settingsFile);
                     _dictionaries.Add(languageID, dictionary);
                 }
