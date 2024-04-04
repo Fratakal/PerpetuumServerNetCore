@@ -20,7 +20,7 @@ namespace Perpetuum.Services.MissionEngine.MissionTargets
    
 
     [Serializable]
-    public abstract class MissionTarget 
+    public abstract class MissionTarget : ICloneable
     {
         public readonly int id;
         private readonly string _name;
@@ -410,7 +410,7 @@ namespace Perpetuum.Services.MissionEngine.MissionTargets
 
         public MissionTarget GetClone()
         {
-            return this.Clone();
+            return this.Clone() as MissionTarget;
         }
 
         private Dictionary<string, object> GenerateMyDictionary()
@@ -1115,6 +1115,12 @@ VALUES  ( @name ,
             Logger.Info(res + " target deleted with eid:" + eid);
 
 
+        }
+
+        public object Clone()
+        {
+            return this.MemberwiseClone();
+            //throw new NotImplementedException();
         }
     }
 }
