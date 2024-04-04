@@ -9,10 +9,21 @@ namespace Perpetuum.Services.ExtensionService
 {
     public class GiveExtensionPointsService : Process
     {
-        private const int BASEPOINTS = 1440;
-        private const int BONUSPOINTS = 2880;
-
+        private readonly int BASEPOINTS;
+        private readonly int BONUSPOINTS;
+        private readonly int SENDNUMBER;
+        private readonly EPConfiguration _globalEpConfiguration;
         private bool _workInProgress;
+
+        public GiveExtensionPointsService(GlobalConfiguration globalConfiguration)
+        {
+            var ep = _globalEpConfiguration = globalConfiguration.ExtentionPoints;
+            var mult = ep.IsEpCycleUseMultiply ? ep.EPBonusPointMultiplier : 1;
+
+            BASEPOINTS = ep.EPBasePointPerCycle * mult;
+            BONUSPOINTS = globalConfiguration.ExtentionPoints.EPBasePointPerCycle * ep.EPBonusPointMultiplier * mult;
+            SENDNUMBER = ep.EPDistributionPerDay - 1;
+        }
 
         public override void Update(TimeSpan time)
         {
@@ -22,7 +33,7 @@ namespace Perpetuum.Services.ExtensionService
         private void GiveExtensionPointsToAccounts()
         {
             var now = DateTime.Now;
-            if (now.Hour < 8 || now.Hour > 11)
+            if (_globalEpConfiguration.EPCycleTimeEnable && (now.Hour < _globalEpConfiguration.EPCycleFromTime || now.Hour > _globalEpConfiguration.EPCycleToTime))
                 return;
 
             if (_workInProgress)
@@ -61,7 +72,7 @@ AND c.inUse=1
 AND e.eventtime >= @now
 ")
                     .SetParameter("@now", now)
-                    .SetParameter("@basePoints",BASEPOINTS)
+                    .SetParameter("@basePoints",BASEPOINTS )
                     .SetParameter("@bonusPoints",BONUSPOINTS)
                     .Execute()
                     .GroupBy(r => r.GetValue<int>(1))
@@ -96,7 +107,7 @@ AND e.eventtime >= @now
             return sqlTime;
         }
 
-        private static bool WasExtensionPointsCheckToday(DateTime dayAgainst)
+        private bool WasExtensionPointsCheckToday(DateTime dayAgainst)
         {
             var count =
                 Db.Query().CommandText("extensionPointsCheck")
@@ -106,7 +117,7 @@ AND e.eventtime >= @now
 #if DEBUG
             Logger.Info(count > 0 ? "extension points were already added today" : "no extension points were added today");
 #endif
-            return count > 0;
+            return count > SENDNUMBER;
         }
     }
 }

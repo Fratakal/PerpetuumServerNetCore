@@ -5,7 +5,7 @@ namespace Perpetuum.Zones.Scanning.Ammos
 {
     public class ArtifactScannerAmmo : GeoScannerAmmo
     {
-        public ArtifactScannerAmmo() : base(AggregateField.mining_probe_artifact_range,AggregateField.mining_probe_artifact_range_modifier)
+        public ArtifactScannerAmmo(GlobalConfiguration globalConfiguration) : base(globalConfiguration, AggregateField.mining_probe_artifact_range,AggregateField.mining_probe_artifact_range_modifier)
         {
 
         }

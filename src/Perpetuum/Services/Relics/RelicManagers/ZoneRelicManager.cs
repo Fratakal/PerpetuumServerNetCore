@@ -33,6 +33,8 @@ namespace Perpetuum.Services.Relics
 
         private RiftSpawnPositionFinder _spawnPosFinder;
 
+        private readonly GlobalConfiguration _globalConfiguration;
+
         private IZone _zone;
         protected override IZone Zone
         {
@@ -50,13 +52,14 @@ namespace Perpetuum.Services.Relics
             }
         }
 
-        public ZoneRelicManager(IZone zone)
+        public ZoneRelicManager(IZone zone, GlobalConfiguration globalConfiguration)
         {
             _lock = new ReaderWriterLockSlim();
             _random = new Random();
             _relics = new List<IRelic>();
             _zone = zone;
             _spawnPosFinder = new PveRiftSpawnPositionFinder(zone);
+            _globalConfiguration = globalConfiguration;
             if (zone.Configuration.Terraformable)
             {
                 _spawnPosFinder = new PvpRiftSpawnPositionFinder(zone);
@@ -64,7 +67,7 @@ namespace Perpetuum.Services.Relics
             // init repositories and extract data
             relicZoneConfigRepository = new RelicZoneConfigRepository(zone);
             relicSpawnInfoRepository = new RelicSpawnInfoRepository(zone);
-            relicLootGenerator = new RelicLootGenerator();
+            relicLootGenerator = new RelicLootGenerator(_globalConfiguration);
 
             //Get Zone Relic-Configuration data
             var config = relicZoneConfigRepository.GetZoneConfig();
@@ -81,7 +84,7 @@ namespace Perpetuum.Services.Relics
             var outposts = _zone.Units.OfType<Outpost>().ToList();
             foreach (var outpost in outposts)
             {
-                outpostRelicManagers.Add(new OutpostRelicManager(outpost));
+                outpostRelicManagers.Add(new OutpostRelicManager(outpost, _globalConfiguration));
             }
             foreach (var childManagers in outpostRelicManagers)
             {

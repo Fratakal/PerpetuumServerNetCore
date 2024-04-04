@@ -33,7 +33,7 @@ namespace Perpetuum.Zones.Scanning.Scanners
         private IArtifactScanner CreateArtifactScanner()
         {
             var factory = new ArtifactScannerFactory(_zone);
-            return  factory.CreateArtifactScanner(_player);
+            return  factory.CreateArtifactScanner(_player, _globalConfiguration);
         }
 
         private Packet BuildScanArtifactResultPacket(Position scanPosition,ArtifactScanResult[] results)

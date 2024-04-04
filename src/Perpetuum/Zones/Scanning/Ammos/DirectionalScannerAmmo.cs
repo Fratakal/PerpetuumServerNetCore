@@ -1,9 +1,14 @@
 ﻿using Perpetuum.EntityFramework;
+using Perpetuum.ExportedTypes;
 
 namespace Perpetuum.Zones.Scanning.Ammos
 {
     public class DirectionalScannerAmmo : GeoScannerAmmo
     {
+        public DirectionalScannerAmmo(GlobalConfiguration globalConfiguration, AggregateField miningProbeRange = AggregateField.undefined, AggregateField miningProbeRangeModifier = AggregateField.undefined) : base(globalConfiguration, miningProbeRange, miningProbeRangeModifier)
+        {
+        }
+
         public override void AcceptVisitor(IEntityVisitor visitor)
         {
             if (!TryAcceptVisitor(this, visitor))

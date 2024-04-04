@@ -10,11 +10,13 @@ namespace Perpetuum.Zones.Artifacts.Generators.Loot
     {
         private readonly IArtifactRepository _artifactRepository;
         private Random _random;
+        private readonly LootConfiguration _lootConfig;
 
-        public ArtifactLootGenerator(IArtifactRepository artifactRepository)
+        public ArtifactLootGenerator(IArtifactRepository artifactRepository, GlobalConfiguration globalConfiguration)
         {
             _artifactRepository = artifactRepository;
             _random = new Random();
+            _lootConfig = globalConfiguration.LootConfiguration;
         }
 
         public ArtifactLootItems GenerateLoot(Artifact artifact)
@@ -36,6 +38,7 @@ namespace Perpetuum.Zones.Artifacts.Generators.Loot
                 foreach (var loot in loots)
                 {
                     var chance = _random.NextDouble();
+                    loot.LootAndChanceMultiplier(_lootConfig);
 
                     if (chance > loot.Chance)
                         continue;

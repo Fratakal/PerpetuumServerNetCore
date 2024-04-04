@@ -12,8 +12,6 @@ namespace Perpetuum
         public string WebServiceIP { get; set; }
         public string PersonalConfig { get; set; }
         public string ConnectionString { get; set; }
-        public string ConnectionStringNetCore { get; set; }
-
         public string RelayName => "relay";
 
         public bool EnableUpnp { get; set; }
@@ -40,5 +38,8 @@ namespace Perpetuum
         // Default EP value for new player.
         [DefaultValue(40000), JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
         public int StartEP { get; set; }
+
+        public EPConfiguration ExtentionPoints { get; set; }
+        public LootConfiguration LootConfiguration { get; set; }
     }
 }

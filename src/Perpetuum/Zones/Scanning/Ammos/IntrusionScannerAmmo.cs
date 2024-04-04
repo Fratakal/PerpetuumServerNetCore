@@ -6,7 +6,7 @@ namespace Perpetuum.Zones.Scanning.Ammos
 {
     public class IntrusionScannerAmmo : GeoScannerAmmo
     {
-        public IntrusionScannerAmmo() : base(AggregateField.mining_probe_intrusion_range, AggregateField.mining_probe_intrusion_range_modifier)
+        public IntrusionScannerAmmo(GlobalConfiguration globalConfiguration) : base(globalConfiguration, AggregateField.mining_probe_intrusion_range, AggregateField.mining_probe_intrusion_range_modifier)
         {
         }
 

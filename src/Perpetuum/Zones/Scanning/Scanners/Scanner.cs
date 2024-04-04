@@ -11,15 +11,17 @@ namespace Perpetuum.Zones.Scanning.Scanners
         private readonly Player _player;
         private readonly GeoScannerModule _module;
         private readonly MaterialHelper _materialHelper;
+        private readonly GlobalConfiguration _globalConfiguration;
 
         public delegate Scanner Factory(IZone zone, Player player, GeoScannerModule module);
 
-        public Scanner(IZone zone,Player player,GeoScannerModule module,MaterialHelper materialHelper)
+        public Scanner(IZone zone,Player player,GeoScannerModule module, GlobalConfiguration globalConfiguration, MaterialHelper materialHelper)
         {
             _zone = zone;
             _player = player;
             _module = module;
             _materialHelper = materialHelper;
+            _globalConfiguration = globalConfiguration;
         }
 
         private void OnMineralScanned(MaterialProbeType materialProbeType,MaterialType materialType = MaterialType.Undefined)

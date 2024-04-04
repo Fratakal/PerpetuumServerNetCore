@@ -10,8 +10,16 @@ namespace Perpetuum.Zones.Scanning.Ammos
     {
         private const int DEFAULT_MINING_PROBE_RANGE = 30;
         private readonly ItemProperty _miningProbeRange;
+        private AggregateField mining_probe_intrusion_range;
+        private AggregateField mining_probe_intrusion_range_modifier;
 
-        protected GeoScannerAmmo(AggregateField miningProbeRange = AggregateField.undefined,AggregateField miningProbeRangeModifier = AggregateField.undefined)
+        protected GeoScannerAmmo(AggregateField mining_probe_intrusion_range, AggregateField mining_probe_intrusion_range_modifier)
+        {
+            this.mining_probe_intrusion_range = mining_probe_intrusion_range;
+            this.mining_probe_intrusion_range_modifier = mining_probe_intrusion_range_modifier;
+        }
+
+        protected GeoScannerAmmo(GlobalConfiguration globalConfiguration, AggregateField miningProbeRange = AggregateField.undefined,AggregateField miningProbeRangeModifier = AggregateField.undefined)
         {
             _miningProbeRange = new MiningProbeRangeProperty(this,miningProbeRange,miningProbeRangeModifier);
             AddProperty(_miningProbeRange);

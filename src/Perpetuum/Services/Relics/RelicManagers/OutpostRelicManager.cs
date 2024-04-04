@@ -45,14 +45,14 @@ namespace Perpetuum.Services.Relics
             }
         }
 
-        public OutpostRelicManager(Outpost outpost)
+        public OutpostRelicManager(Outpost outpost, GlobalConfiguration globalConfiguration)
         {
             _lock = new ReaderWriterLockSlim();
             _outpost = outpost;
             _random = new Random();
             _relics = new List<IRelic>();
             _zone = outpost.Zone;
-            relicLootGenerator = new RelicLootGenerator();
+            relicLootGenerator = new RelicLootGenerator(globalConfiguration);
             _max_relics = 1;
             _respawnRandomized = RollNextSpawnTime();
             _sapRelicInfo = RelicInfo.GetByNameFromDB("sap_relic_basetype");

@@ -20,18 +20,21 @@ namespace Perpetuum.Accounting
         private readonly AccountWalletFactory walletFactory;
         private readonly EpForActivityLogger epForActivityLogger;
         private readonly EPBonusEventService epBonusEventService;
+        private readonly GlobalConfiguration globalConfiguration;
 
         public AccountManager(IAccountRepository accountRepository,
             AccountTransactionLogger transactionLogger,
             AccountWalletFactory walletFactory,
             EpForActivityLogger epForActivityLogger,
-            EPBonusEventService epBonusEventService)
+            EPBonusEventService epBonusEventService,
+            GlobalConfiguration globalConfiguration)
         {
             Repository = accountRepository;
             this.transactionLogger = transactionLogger;
             this.walletFactory = walletFactory;
             this.epForActivityLogger = epForActivityLogger;
             this.epBonusEventService = epBonusEventService;
+            this.globalConfiguration = globalConfiguration;
         }
 
         public IAccountRepository Repository { get; }
@@ -364,7 +367,7 @@ namespace Perpetuum.Accounting
             var itemIncrease = GetEpBonusFromSubscription(account);
             var rawPoints = points;
             var boostFactor = GetExperienceBoostingFactor(GetExtensionPointsCollected(account), SERVER_DESIRED_EP_LEVEL);
-            var boostedPoints = GetBoostedExtensionPoints(account, points, bonusIncrease, itemIncrease);
+            var boostedPoints = GetBoostedExtensionPoints(account, points, bonusIncrease, itemIncrease) * globalConfiguration.ExtentionPoints.EPMultiplier;
 
             Transaction.Current.OnCommited(() =>
             {

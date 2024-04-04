@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using Perpetuum.Builders;
 using Perpetuum.Data;
+using Perpetuum.Services.Channels;
 using Perpetuum.Services.Looting;
 
 namespace Perpetuum.Zones.Artifacts
@@ -9,6 +10,7 @@ namespace Perpetuum.Zones.Artifacts
     {
         double Chance { get; }
         IBuilder<LootItem> GetLootItemBuilder();
+        void LootAndChanceMultiplier(LootConfiguration lootConfig);
     }
 
     /// <summary>
@@ -25,6 +27,18 @@ namespace Perpetuum.Zones.Artifacts
             return LootItemBuilder.Create(Definition)
                 .SetQuantity(FastRandom.NextInt(Quantity))
                 .SetRepackaged(Packed);
+        }
+
+        public void LootAndChanceMultiplier(LootConfiguration lootConfig)
+        {
+            Chance = Chance * lootConfig.LootProbabilityMultiplier;
+
+            if (Quantity.Max > 1 || (Quantity.Max == 1 && lootConfig.LootOverrideMaxValueOfOne))
+            {
+                var min = Quantity.Min * lootConfig.LootQuantityMultiplier;
+                var max = Quantity.Max * lootConfig.LootQuantityMultiplier;
+                Quantity = new IntRange(min, max);
+            }
         }
 
         private bool Packed { get; set; }

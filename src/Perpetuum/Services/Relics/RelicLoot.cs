@@ -13,12 +13,14 @@ namespace Perpetuum.Services.Relics
     public class RelicLootGenerator
     {
         private readonly RelicLootReader _relicLootRepository;
+        private readonly LootConfiguration _lootConfig;
         private Random _random;
 
-        public RelicLootGenerator()
+        public RelicLootGenerator(GlobalConfiguration configuration)
         {
             _relicLootRepository = new RelicLootReader();
             _random = new Random();
+            _lootConfig = configuration.LootConfiguration;
         }
 
         //Guard loot-loop from empty or low probability loot tables (would indicate bad/missing Relicloot entries)
@@ -31,7 +33,7 @@ namespace Perpetuum.Services.Relics
         {
             var result = new List<LootItem>();
 
-            var loots = _relicLootRepository.GetRelicLoots(relicInfo).ToArray();
+            var loots = _relicLootRepository.GetRelicLoots(relicInfo, _lootConfig).ToArray();
 
             if (!HasValidLoots(loots))
                 return null;
@@ -92,32 +94,44 @@ namespace Perpetuum.Services.Relics
         private bool Packed { get; set; }
         private int RelicInfoId { get; set; }
 
-        public RelicLoot(IDataRecord record)
+        public RelicLoot(IDataRecord record, LootConfiguration _lootConfig)
         {
+            var minq = record.GetValue<int>("minquantity");
+            var maxq = record.GetValue<int>("maxquantity");
+            var chance = (float)record.GetValue<decimal>("chance");
+            var chanceMult = chance * _lootConfig.LootProbabilityMultiplier;
+
+
+            if (maxq > 1 || (maxq == 1 && _lootConfig.LootOverrideMaxValueOfOne))
+            {
+                minq = minq * _lootConfig.LootQuantityMultiplier;
+                maxq = maxq * _lootConfig.LootQuantityMultiplier;
+            }
+
             Definition = record.GetValue<int>("definition");
-            Quantity = new IntRange(record.GetValue<int>("minquantity"), record.GetValue<int>("maxquantity"));
-            Chance = (float)record.GetValue<decimal>("chance");
+            Quantity = new IntRange(minq, maxq);
+            Chance = chanceMult > 1 ? 1 : chanceMult;
             Packed = record.GetValue<bool>("packed");
             RelicInfoId = record.GetValue<int>("relictypeid");
 
         }
-
     }
 
 
     public class RelicLootReader
     {
-        protected IRelicLoot CreateRelicLootFromRecord(IDataRecord record)
+        protected IRelicLoot CreateRelicLootFromRecord(IDataRecord record, LootConfiguration _lootConfig)
         {
-            return new RelicLoot(record);
+            return new RelicLoot(record, _lootConfig);
         }
 
-        public IEnumerable<IRelicLoot> GetRelicLoots(RelicInfo info)
+        public IEnumerable<IRelicLoot> GetRelicLoots(RelicInfo info, LootConfiguration _lootConfig)
         {
-            var loots = Db.Query().CommandText("SELECT definition,minquantity,maxquantity,chance,relictypeid,packed FROM relicloot WHERE relictypeid = @relicInfoId")
+            var loots = Db.Query()
+                .CommandText("SELECT definition,minquantity,maxquantity,chance,relictypeid,packed FROM relicloot WHERE relictypeid = @relicInfoId")
                 .SetParameter("@relicInfoId", info.GetID())
                 .Execute()
-                .Select(CreateRelicLootFromRecord);
+                .Select(x => CreateRelicLootFromRecord(x, _lootConfig));
 
             return loots.ToList();
         }

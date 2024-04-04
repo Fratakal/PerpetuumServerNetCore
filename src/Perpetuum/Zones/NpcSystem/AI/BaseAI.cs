@@ -52,7 +52,7 @@ namespace Perpetuum.Zones.NpcSystem.AI
         [Conditional("DEBUG")]
         protected void WriteLog(string message)
         {
-            Logger.DebugInfo($"SmartCreatureAI: {message}");
+            //Logger.DebugInfo($"SmartCreatureAI: {message}");
         }
 
         protected virtual void ToEscortCombatDroneAI()

@@ -5,7 +5,7 @@ namespace Perpetuum.Zones.Scanning.Ammos
 {
     public class TileScannerAmmo : GeoScannerAmmo
     {
-        public TileScannerAmmo() : base(AggregateField.tile_based_mining_probe_radius, AggregateField.mining_probe_tile_range_modifier)
+        public TileScannerAmmo(GlobalConfiguration globalConfiguration) : base(globalConfiguration, AggregateField.tile_based_mining_probe_radius, AggregateField.mining_probe_tile_range_modifier)
         {
         }
 
